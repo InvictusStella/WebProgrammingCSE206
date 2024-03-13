@@ -3,7 +3,7 @@
 * Sketch of a layout created using bootstrap 5
 * Readme.md added
 
-### CURRENT FUNCTIONALTIY
+## CURRENT FUNCTIONALTIY
 Not much functioality achieved as of now but additions will be made with time.
 
 ### SECOND COMMIT 14/03/2024
