@@ -22,3 +22,13 @@ I know it's been a long time, it's good to see you too.
 
 Page links created allowing for transition between pages and allowing access to all pages created for now. Sidebar navigation functional for aforementioned pages. Icons added for better immersion and user design.
 
+### THIRD COMMIT 15/03/2024
+
+I tried to start the backend work right after yesterday's commit. I've come some way but it is mostly nothing still.
+
+* Created a coursesCreate page and linked it with the rest of the pages. We will be creating courses for our table in here.
+* Created courseCreate.php to start some backend and give proper functionality to coursesCreate page.
+
+## ADDED FUNCTIONALITY 
+
+Some backend code to hold given course properties before putting them on table. Need to figure out MySQL and jQuery to complete. 
