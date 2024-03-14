@@ -13,6 +13,29 @@
     <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: 'courseCreate.php',
+                method: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    var courseInfo = data;
+                    var row = $('<tr>');
+                    row.append('<th scope="row">' + ($('#courseTable tr').length) + '</th>');
+                    row.append('<td>' + courseInfo.courseID + '</td>');
+                    row.append('<td>' + courseInfo.courseName + '</td>');
+                    row.append('<td>' + courseInfo.numStudents + '</td>');
+                    row.append('<td>' + courseInfo.numExams + '</td>'); 
+                    row.append('<td>' + courseInfo.courseGiver + '</td>');
+                    $('#courseTable').append(row);
+                }
+            });
+        });
+    </script>
+
+
 </head>
 <body>
     <div class="d-flex" id="wrapper">
@@ -51,6 +74,11 @@
                     <a id="examCreation"
                        href=examCreate.html
                        class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Create Exam</a>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3 ps-5"
+                       id="courseCreateButton"
+                       href=coursesCreate.html>
+                        Create Course
+                    </a>
                 </div>
 
                 <button class="list-group-item list-group-item-action list-group-item-light p-3 d-flex justify-content-between align-items-center"
