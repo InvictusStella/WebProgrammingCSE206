@@ -32,3 +32,16 @@ I tried to start the backend work right after yesterday's commit. I've come some
 ## ADDED FUNCTIONALITY 
 
 Some backend code to hold given course properties before putting them on table. Need to figure out MySQL and jQuery to complete. 
+
+### FOURTH COMMIT 20/03/2024
+
+Start of integration of database into site.
+
+* courses.html --> courses.php 
+* A dynamic table that feeds on a database in courses.php
+* Remodelling of file positioning in file planing so it looks cleaner
+* exam_system database creation and insertion of couple placeholders
+
+## ADDED FUNCTIONALITY
+
+Some more backend code to complement our site and make it more dynamic. Pages start getting change to .php.
