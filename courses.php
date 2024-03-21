@@ -158,6 +158,7 @@
                         </tr>
                     </thead>
                     <tbody id="courseTable">
+                        
                         <?php
                             $servername = "localhost";
                             $username = "admin";
@@ -171,19 +172,20 @@
                             if ($conn->connect_error) {
                                 die("Connection failed: " . $conn->connect_error);
                             }
-                            echo "Connected successfully";
 
-                            $sql = "SELECT c.pk, c.courseName as cName, c.courseCode, i.name as iname FROM courses AS c JOIN instructors AS i ON i.pk = instructorFk";
+                            $sql = "SELECT c.pk as cpk, courseName as cName, courseCode, i.name as iname FROM courses AS c JOIN instructors AS i ON i.pk = instructorFk";
                             $result = $conn->query($sql);
 
                             if ($result->num_rows > 0) {
                             // output data of each row
                                 while($row = $result->fetch_assoc()) {
                                     ?>
-                                    <td><?php echo $row['c.pk']; ?></td>
+                                    <tr>
+                                    <td><?php echo $row['cpk']?></td>
+                                    <td><?php echo $row['courseCode']; ?></td>
                                     <td><?php echo $row['cName']; ?></td>
-                                    <td><?php echo $row['c.courseCode']; ?></td>
                                     <td><?php echo $row['iname']; ?></td>
+                                    </tr>
                                     <?php
                                 }
                             } else {
@@ -192,6 +194,7 @@
 
                             $conn->close();
                         ?>
+                        
                     </tbody>
                 </table>
             </div>
