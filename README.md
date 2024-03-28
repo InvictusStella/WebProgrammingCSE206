@@ -45,3 +45,12 @@ Start of integration of database into site.
 ## ADDED FUNCTIONALITY
 
 Some more backend code to complement our site and make it more dynamic. Pages start getting change to .php.
+
+### FIFTH COMMIT 
+
+Course and exam tables become dynamic and connect to database.
+
+* courseDetails.php create
+* examCreate.html -> examCreate.php
+* Dynamically populated tables for both
+* Exam creation form for insertion into database
