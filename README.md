@@ -54,3 +54,12 @@ Course and exam tables become dynamic and connect to database.
 * examCreate.html -> examCreate.php
 * Dynamically populated tables for both
 * Exam creation form for insertion into database
+
+### SIXTH COMMIT 
+
+* login.php created
+* coursedetails.php updated
+
+## ADDED FUNCTIONALIY 
+
+Login page does login and update, delete buttons for rows in courseDetails.php
