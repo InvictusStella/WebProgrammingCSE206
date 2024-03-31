@@ -1,0 +1,113 @@
+<?php
+    $servername = "localhost";
+    $username = "admin";
+    $password = ".YfP3orpdLop.xUw";
+    $db_name = "exam_system";
+
+    $conn = new mysqli($servername, $username, $password, $db_name);
+
+    if($conn -> connect_error) {
+        die("Connection failed: " . $conn -> connect_error);
+    }
+
+    if(isset($_POST['submit'])) {
+        session_start();
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        // Prepare SQL statement to prevent SQL injection
+        $stmt = $conn->prepare("(SELECT name, email, password FROM students WHERE email = ? AND password = ?) 
+            UNION 
+            (SELECT name, email, password FROM instructors WHERE email = ? AND password = ?)");
+        $stmt->bind_param("ss", $email, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if($result -> num_rows > 0) {
+            $row = $result -> fetch_assoc();
+
+            // Verify password
+            if(password_verify($password, $row['password'])) {
+                $_SESSION['email'] = $row['email'];
+                $_SESSION['password'] = $row['password'];
+                $_SESSION['name'] = $row['name'];
+
+                // Check if user is an instructor
+                $stmt_instructor = $conn->prepare("SELECT name, email, password FROM instructors WHERE email = ? AND password = ?");
+                $stmt_instructor->bind_param("s", $email, $password);
+                $stmt_instructor->execute();
+                $result_instructor = $stmt_instructor->get_result();
+
+                if($result_instructor -> num_rows > 0) {
+                    header('Location: index.html');
+                } else {
+                    echo "Not an instructor";
+                }
+            } else {
+                echo "Invalid password";
+            }
+        } else {
+            echo "Invalid email";
+        }
+    }
+?>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OES Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container border border-secondary" style="margin-top: 200px;">
+        <h2 style="text-align: center;"><img src="assets/OES.ico" alt="Icon" style="height: 150 px; width: 150px; display: block; margin: auto; margin-bottom: 10px;">Welcome to OES</h2>
+        <form action="login.php" method="POST">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group mt-3">
+                <button type="submit" name="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
