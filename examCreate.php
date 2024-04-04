@@ -32,13 +32,11 @@
             exit;
         }
 
-        if($examType == 'final') {
-            $stmt = $conn->prepare("SELECT * FROM exam WHERE courseFk = ? AND type = ?");
-            $stmt->bind_param("is", $cpk, $examType);
-            $stmt->execute();
-            $result = $stmt->get_result();
+        if($examType == 'Final') {
+            $stmt_check = "SELECT * FROM exam WHERE courseFk = '$cpk' AND type = '$examType'";
+            $result_check = $conn->query($stmt_check);
     
-            if($result->num_rows > 0) {
+            if($result_check->num_rows > 0) {
                 echo "Error: A final exam already exists for this course";
                 exit;
             }
@@ -46,14 +44,36 @@
 
         $stmt = $conn->prepare("INSERT INTO exam (courseFk, date, type, grade) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("isss", $cpk, $examDate, $examType, $grade);
-        $stmt->execute();
 
-        if ($stmt->execute() === TRUE) {
+        if ($stmt->execute()) {
             echo "New exam created successfully";
-            header('Location: courseDetails.php?cpk=' . $cpk . '&addSuccess=true');
+            header('Location: courseDetails.php?cpk=' . $cpk);
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
+    }
+
+
+    if (isset($_POST['logout'])) {
+        // Unset all of the session variables
+        $_SESSION = array();
+    
+        // If it's desired to kill the session, also delete the session cookie.
+        // Note: This will destroy the session, and not just the session data!
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+    
+        // Finally, destroy the session.
+        session_destroy();
+    
+        // Redirect to login page after logout
+        header("Location: login.php");
+        exit;
     }
 ?>
 
@@ -157,8 +177,10 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $_SESSION['name'] ?></a>
                                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="#!">Log Out</a>
-
+                                        <form method="post" style="display: flex; justify-content: center">
+                                            <img src="assets/logout.png" alt="logout" style="width: 20px; height: 25px; margin: auto; display: block;">
+                                            <button type="submit" name="logout" class="btn btn-primary" style="background: none; border: none; color: black;">Logout</button>
+                                        </form>
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
@@ -184,7 +206,12 @@
                     <form class="mt-5" method="POST">
                         <div class="mb-3">
                             <label for="examType" class="form-label">Exam Type*</label>
-                            <input type="text" name = "examType" class="form-control" id="examType" placeholder="Enter exam type" required>
+                            <select type="text" name = "examType" class="form-control" id="examType" required>
+                                <option value="Midterm">Midterm</option>
+                                <option value="Final">Final</option>
+                                <option value="Quiz">Quiz</option>
+                                <option value="Assignment">Assignment</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="examDate" class="form-label">Exam Date*</label>

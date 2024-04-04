@@ -1,5 +1,27 @@
 <?php
     session_start();
+
+    if (isset($_POST['logout'])) {
+        // Unset all of the session variables
+        $_SESSION = array();
+    
+        // If it's desired to kill the session, also delete the session cookie.
+        // Note: This will destroy the session, and not just the session data!
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+    
+        // Finally, destroy the session.
+        session_destroy();
+    
+        // Redirect to login page after logout
+        header("Location: login.php");
+        exit;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -133,8 +155,10 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $_SESSION['name'] ?></a>
                                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="#!">Log Out</a>
-
+                                        <form method="post" style="display: flex; justify-content: center">
+                                            <img src="assets/logout.png" alt="logout" style="width: 20px; height: 25px; margin: auto; display: block;">
+                                            <button type="submit" name="logout" class="btn btn-primary" style="background: none; border: none; color: black;">Logout</button>
+                                        </form>
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">

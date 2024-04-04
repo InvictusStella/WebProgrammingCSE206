@@ -13,7 +13,7 @@
     if(isset($_POST['submit'])) {
         session_start();
         $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-        $password = $_POST['password'];
+        $password = md5($_POST['password']);
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             echo("Invalid email format");
@@ -21,31 +21,30 @@
           }
 
         // Prepare SQL statement to prevent SQL injection
-        $sql = $conn->prepare("(SELECT name, email, password FROM students WHERE email = $email AND password = $password) 
+        $sql = "(SELECT name, email, password FROM students WHERE email = '$email' AND password = '$password') 
             UNION 
-            (SELECT name, email, password FROM instructors WHERE email = $email AND password = $password)");
-        $sql->execute();
-        $result = $sql->get_result();
+            (SELECT name, email, password FROM instructors WHERE email = '$email' AND password = '$password')";
+        $result = $conn ->query($sql);
 
         if($result -> num_rows > 0) {
             $row = $result -> fetch_assoc();
 
             // Verify password
-            if(password_verify($password, $row['password'])) {
+            if($password === $row['password']) {
                 $_SESSION['email'] = filter_var($row['email'], FILTER_SANITIZE_EMAIL);
                 $_SESSION['password'] = $row['password'];
                 $_SESSION['name'] = $row['name'];
 
                 // Check if user is an instructor
                 $stmt_instructor = $conn->prepare("SELECT name, email, password FROM instructors WHERE email = ? AND password = ?");
-                $stmt_instructor->bind_param("s", $email, $password);
+                $stmt_instructor->bind_param("si", $email, $password);
                 $stmt_instructor->execute();
                 $result_instructor = $stmt_instructor->get_result();
 
                 if($result_instructor -> num_rows > 0) {
-                    header('Location: index.html');
+                    header('Location: instructorIndex.php');
                 } else {
-                    echo "Not an instructor";
+                    echo "Student page will be implemented soon.";
                 }
             } else {
                 echo "Invalid password";
@@ -110,6 +109,9 @@
             </div>
             <div class="form-group mt-3">
                 <button type="submit" name="submit" class="btn btn-primary">Login</button>
+            </div>
+            <div class="form-group mt-3 text-center">
+                <a href="#!" style="display: block;">Sign In</a>
             </div>
         </form>
     </div>

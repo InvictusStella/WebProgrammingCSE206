@@ -20,10 +20,6 @@
         exit;
     }
 
-    if (isset($_GET['addSuccess'])) {
-        echo "<script type='text/javascript'>alert('New exam created successfully');</script>";
-    }
-
     if(isset($_POST["delete"])) {
         $pkDelete = $_POST['pkDelete'];
 
@@ -42,23 +38,23 @@
     }
 
     if(isset($_POST["update"])) {
+        $_SESSION['accessTime'] = time();
+
         $pkUpdate = $_POST['pkUpdate'];
         $type = $_POST['type'];
         $date = $_POST['date'];
         $grade = $_POST['grade'];
+        $updateBy = $_SESSION['name'];
+        $updateTime = date('Y-m-d', $_SESSION['accessTime']);
 
-        if($examType == 'Final') {
-            $stt = $conn->prepare("SELECT * FROM exam WHERE courseFk = ? AND type = ?");
-            $stt->bind_param("is", $cpk, $examType);
-            $stt->execute();
-            $result = $stt->get_result();
+        if($type == 'Final') {
+            $stt = "SELECT * FROM exam WHERE courseFk = '$pkUpdate' AND type = '$type'";
+            $result = $conn->query($stt);
     
             if($result->num_rows > 0) {
                 echo "Error: A final exam already exists for this course";
                 exit;
             }
-
-            $stt->close();
         }
 
         if($grade < 0 || $grade > 100) {
@@ -66,10 +62,9 @@
             exit;
         }
 
-        $sql = "UPDATE exam SET type = ?, date = ?, grade = ? WHERE pk = ?";
-
+        $sql = "UPDATE exam SET type = ?, date = ?, grade = ?, updatedBy = ?, updateTime = ? WHERE pk = ?";
         $stmt = $conn->prepare($sql);  
-        $stmt->bind_param("ssii", $type, $date, $grade, $pkUpdate);
+        $stmt->bind_param("ssissi", $type, $date, $grade, $updateBy, $updateTime, $pkUpdate);
 
         if ($stmt->execute()) {
             echo "<script type='text/javascript'>alert('Exam updated successfully');</script>";
@@ -78,6 +73,28 @@
         }
 
         $stmt->close();
+    }
+
+    if (isset($_POST['logout'])) {
+        // Unset all of the session variables
+        $_SESSION = array();
+    
+        // If it's desired to kill the session, also delete the session cookie.
+        // Note: This will destroy the session, and not just the session data!
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+    
+        // Finally, destroy the session.
+        session_destroy();
+    
+        // Redirect to login page after logout
+        header("Location: login.php");
+        exit;
     }
 ?>
 
@@ -181,8 +198,10 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $_SESSION['name'] ?></a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="#!">Log Out</a>
-
+                                    <form method="post" style="display: flex; justify-content: center">
+                                        <img src="assets/logout.png" alt="logout" style="width: 20px; height: 25px; margin: auto; display: block;">
+                                        <button type="submit" name="logout" class="btn btn-primary" style="background: none; border: none; color: black;">Logout</button>
+                                    </form>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -229,25 +248,32 @@
                 <table class="table table-striped table-hover">
                     <thead class="table-light mt-5 ms-auto">
                         <tr>
+                            <th scope="col">#</th>
                             <th scope="col">Exam ID</th>
                             <th scope="col">Exam Type</th>
                             <th scope="col">Exam Date</th>
                             <th scope="col">Average Score</th>
+                            <th scope="col">Updated By</th>
+                            <th scope="col">Update Time</th>
                         </tr>
                     </thead>
                     <tbody id="examTable">
                         <?php
-                            $sql = "SELECT pk, type, date, grade FROM exam WHERE courseFk = $cpk";
+                            $sql = "SELECT pk, type, date, grade, updatedBy, updateTime FROM exam WHERE courseFk = $cpk";
                             $result = $conn-> query($sql);
+                            $rowNum = 1;
                             
                             while ($row = $result->fetch_assoc()) {
                                 ?>
                                 
                                 <tr>
+                                    <td><?php echo $rowNum++ ?></td>
                                     <td><?php echo $row['pk']; ?></td>
                                     <td><?php echo $row['type']; ?></td>
                                     <td><?php echo $row['date']; ?></td>
                                     <td><?php echo $row['grade']; ?></td>
+                                    <td><?php echo $row['updatedBy']; ?></td>
+                                    <td><?php echo $row['updateTime']; ?></td>
                                     <td>
                                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateModal<?php echo $row['pk']; ?>">
                                                 Update
@@ -264,7 +290,12 @@
                                                             <input type="hidden" name="pkUpdate" value="<?php echo $row['pk']; ?>">
                                                             <div class="mb-3">
                                                                 <label for="type" class="form-label">Type</label>
-                                                                <input type="text" class="form-control" id="type" name="type" value="<?php echo $row['type']; ?>">
+                                                                <select type="text" class="form-control" id="type" name="type" value="<?php echo $row['type']; ?>">
+                                                                    <option value="Midterm">Midterm</option>
+                                                                    <option value="Final">Final</option>
+                                                                    <option value="Quiz">Quiz</option>
+                                                                    <option value="Assignment">Assignment</option>
+                                                                </select>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="date" class="form-label">Date</label>
