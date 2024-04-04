@@ -63,3 +63,10 @@ Course and exam tables become dynamic and connect to database.
 ## ADDED FUNCTIONALIY 
 
 Login page does login and update, delete buttons for rows in courseDetails.php
+
+### SEVENTH COMMIT 
+
+* login.php fields sanitization and md5 for more password security
+* index.html--> instructorIndex.php
+* logout button active
+* updatedBy and updateTime in courseDetails
