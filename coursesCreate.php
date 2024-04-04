@@ -1,60 +1,5 @@
 <?php
     session_start();
-    $servername = "localhost";
-    $username = "admin";
-    $password = ".YfP3orpdLop.xUw";
-    $db_name = "exam_system";
-
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $db_name);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-
-    if (isset($_GET['cpk'])) {
-        $cpk = $_GET['cpk'];
-    } else {
-        header('Location: courseDetails.php');
-        exit;
-    }
-
-
-    if($_SERVER["REQUEST_METHOD"] == "POST") {
-        $examType = $_POST['examType'];
-        $examDate = $_POST['examDate'];
-        $grade = $_POST['grade'];
-
-        if($grade < 0 || $grade > 100) {
-            echo "Error: Grade must be between 0 and 100";
-            exit;
-        }
-
-        if($examType == 'final') {
-            $stmt = $conn->prepare("SELECT * FROM exam WHERE courseFk = ? AND type = ?");
-            $stmt->bind_param("is", $cpk, $examType);
-            $stmt->execute();
-            $result = $stmt->get_result();
-    
-            if($result->num_rows > 0) {
-                echo "Error: A final exam already exists for this course";
-                exit;
-            }
-        }
-
-        $stmt = $conn->prepare("INSERT INTO exam (courseFk, date, type, grade) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $cpk, $examDate, $examType, $grade);
-        $stmt->execute();
-
-        if ($stmt->execute() === TRUE) {
-            echo "New exam created successfully";
-            header('Location: courseDetails.php?cpk=' . $cpk . '&addSuccess=true');
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-    }
 ?>
 
 <!DOCTYPE html>
@@ -73,8 +18,39 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#courseForm").on('submit', function (e) {
+                e.preventDefault();
 
-    
+                var courseID = $("#courseID").val();
+                var courseName = $("#courseName").val();
+                var numStudents = $("#numStudents").val();
+                var courseGiver = $("#courseGiver").val();
+                var numExams = $("#numExams").val();
+
+                $.ajax({
+                    url: 'courseCreate.php', // replace with your PHP file
+                    type: 'POST',
+                    data: {
+                        courseID: courseID,
+                        courseName: courseName,
+                        numStudents: numStudents,
+                        numExams : numExams,
+                        courseGiver: courseGiver
+                    },
+                    success: function (data) {
+                        alert('Course successfully created');
+                        // you can also refresh the page or redirect to another page here
+                    },
+                    error: function () {
+                        alert('An error occurred');
+                    }
+                });
+            });
+        });
+    </script>
+
 </head>
     <body>
         <div class="d-flex" id="wrapper">
@@ -109,7 +85,7 @@
                            class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Events</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3 ps-5"
                            id="courseCreateButton"
-                           href=coursesCreate.php>
+                           href=coursesCreate.html>
                             Create Course
                         </a>
                     </div>
@@ -181,20 +157,28 @@
                 </nav>
                 <!-- Page content-->
                 <div class="container-fluid">
-                    <form class="mt-5" method="POST">
+                    <form class="mt-5" id="courseForm">
                         <div class="mb-3">
-                            <label for="examType" class="form-label">Exam Type*</label>
-                            <input type="text" name = "examType" class="form-control" id="examType" placeholder="Enter exam type" required>
+                            <label for="courseID" class="form-label">Course ID</label>
+                            <input type="text" class="form-control" id="courseID" placeholder="Enter course ID">
                         </div>
                         <div class="mb-3">
-                            <label for="examDate" class="form-label">Exam Date*</label>
-                            <input type="date" name = "examDate" class="form-control" id="examDate" required>
+                            <label for="courseName" class="form-label">Course Name</label>
+                            <input type="text" class="form-control" id="courseName" placeholder="Enter course name">
                         </div>
                         <div class="mb-3">
-                            <label for="grade" class="form-label">Average Grade*</label>
-                            <input type="number" name="grade" class="form-control" id="grade" placeholder="Enter the average grade" required>
+                            <label for="numStudents" class="form-label">Number of Students</label>
+                            <input type="number" class="form-control" id="numStudents" placeholder="Enter number of students">
                         </div>
-                        <button type="submit" name="submit" class="btn btn-primary">Create Exam</button>
+                        <div class="mb-3">
+                            <label for="numExams" class="form-label">Number of Exams</label>
+                            <input type="number" class="form-control" id="numExams" placeholder="Enter number of exams">
+                        </div>
+                        <div class="mb-3">
+                            <label for="courseGiver" class="form-label">Course Giver</label>
+                            <input type="text" class="form-control" id="courseGiver" placeholder="Enter course giver">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Course</button>
                     </form>
                 </div>
             </div>

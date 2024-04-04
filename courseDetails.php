@@ -1,4 +1,5 @@
 <?php
+    session_start();
     $servername = "localhost";
     $username = "admin";
     $password = ".YfP3orpdLop.xUw";
@@ -46,6 +47,20 @@
         $date = $_POST['date'];
         $grade = $_POST['grade'];
 
+        if($examType == 'Final') {
+            $stt = $conn->prepare("SELECT * FROM exam WHERE courseFk = ? AND type = ?");
+            $stt->bind_param("is", $cpk, $examType);
+            $stt->execute();
+            $result = $stt->get_result();
+    
+            if($result->num_rows > 0) {
+                echo "Error: A final exam already exists for this course";
+                exit;
+            }
+
+            $stt->close();
+        }
+
         if($grade < 0 || $grade > 100) {
             echo "<script type='text/javascript'>alert('Error: Grade must be between 0 and 100');</script>";
             exit;
@@ -89,7 +104,7 @@
         <!-- Sidebar-->
         <div class="border-end bg-white" id="sidebar-wrapper">
             <div class="sidebar-heading border-bottom bg-light" style="text-align: center">
-                <a id="homePage" href=index.html>
+                <a id="homePage" href=instructorIndex.php>
                     <img src="assets/OES.ico" alt="Icon" style="width: 100px; height: 100px; display: block; margin: auto" />
                 </a>
                 OES
@@ -117,7 +132,7 @@
                        class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Events</a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3 ps-5"
                        id="courseCreateButton"
-                       href=coursesCreate.html>
+                       href=coursesCreate.php>
                         Create Course
                     </a>
                     
@@ -161,10 +176,10 @@
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                            <li class="nav-item active"><a class="nav-link" href="index.html">Home</a></li>
+                            <li class="nav-item active"><a class="nav-link" href="instructorIndex.php">Home</a></li>
 
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">John Doe</a>
+                                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $_SESSION['name'] ?></a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="#!">Log Out</a>
 
@@ -267,7 +282,7 @@
                                         </div>                                          
                                     </td>
                                     <td>
-                                        <form method="post">
+                                        <form method="post" onsubmit="return confirm('Are you sure you want to delete?')">
                                             <input type="hidden" name="pkDelete" value="<?php echo $row['pk']; ?>">
                                             <button type="submit" name="delete" class="btn btn-primary" style="background-color: red; text-align: center;"> Delete </button>
                                         </form>

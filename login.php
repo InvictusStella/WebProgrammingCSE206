@@ -12,23 +12,27 @@
 
     if(isset($_POST['submit'])) {
         session_start();
-        $email = $_POST['email'];
+        $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'];
 
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo("Invalid email format");
+            exit;
+          }
+
         // Prepare SQL statement to prevent SQL injection
-        $stmt = $conn->prepare("(SELECT name, email, password FROM students WHERE email = ? AND password = ?) 
+        $sql = $conn->prepare("(SELECT name, email, password FROM students WHERE email = $email AND password = $password) 
             UNION 
-            (SELECT name, email, password FROM instructors WHERE email = ? AND password = ?)");
-        $stmt->bind_param("ss", $email, $password);
-        $stmt->execute();
-        $result = $stmt->get_result();
+            (SELECT name, email, password FROM instructors WHERE email = $email AND password = $password)");
+        $sql->execute();
+        $result = $sql->get_result();
 
         if($result -> num_rows > 0) {
             $row = $result -> fetch_assoc();
 
             // Verify password
             if(password_verify($password, $row['password'])) {
-                $_SESSION['email'] = $row['email'];
+                $_SESSION['email'] = filter_var($row['email'], FILTER_SANITIZE_EMAIL);
                 $_SESSION['password'] = $row['password'];
                 $_SESSION['name'] = $row['name'];
 
@@ -97,11 +101,11 @@
         <h2 style="text-align: center;"><img src="assets/OES.ico" alt="Icon" style="height: 150 px; width: 150px; display: block; margin: auto; margin-bottom: 10px;">Welcome to OES</h2>
         <form action="login.php" method="POST">
             <div class="form-group">
-                <label for="email">Email:</label>
+                <label for="email">Email: *</label>
                 <input type="text" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Password: *</label>
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="form-group mt-3">
