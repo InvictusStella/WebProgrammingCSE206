@@ -31,7 +31,7 @@
 
             // Verify password
             if($password === $row['password']) {
-                $_SESSION['email'] = filter_var($row['email'], FILTER_SANITIZE_EMAIL);
+                $_SESSION['email'] = $row['email'];
                 $_SESSION['password'] = $row['password'];
                 $_SESSION['name'] = $row['name'];
 

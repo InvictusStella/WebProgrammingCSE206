@@ -25,7 +25,7 @@
     if($_SERVER["REQUEST_METHOD"] == "POST") {
         $examType = $_POST['examType'];
         $examDate = $_POST['examDate'];
-        $grade = $_POST['grade'];
+        $grade = filter_var($_POST['grade'], FILTER_SANITIZE_NUMBER_INT);
 
         if($grade < 0 || $grade > 100) {
             echo "Error: Grade must be between 0 and 100";
@@ -46,7 +46,7 @@
         $stmt->bind_param("isss", $cpk, $examDate, $examType, $grade);
 
         if ($stmt->execute()) {
-            echo "New exam created successfully";
+            echo "<script type='text/javascript'>alert('Exam created successfully');</script>";
             header('Location: courseDetails.php?cpk=' . $cpk);
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;

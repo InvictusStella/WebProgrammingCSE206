@@ -43,19 +43,21 @@
         $pkUpdate = $_POST['pkUpdate'];
         $type = $_POST['type'];
         $date = $_POST['date'];
-        $grade = $_POST['grade'];
+        $grade = filter_var($_POST['grade'], FILTER_SANITIZE_NUMBER_INT);
         $updateBy = $_SESSION['name'];
         $updateTime = date('Y-m-d', $_SESSION['accessTime']);
 
         if($type == 'Final') {
-            $stt = "SELECT * FROM exam WHERE courseFk = '$pkUpdate' AND type = '$type'";
+            $stt = "SELECT type, pk FROM exam WHERE courseFk = $cpk AND type = 'Final'";
             $result = $conn->query($stt);
     
-            if($result->num_rows > 0) {
+            if($result->num_rows > 0 && $pkUpdate != $result->fetch_assoc()['pk']) {
                 echo "Error: A final exam already exists for this course";
                 exit;
             }
         }
+
+
 
         if($grade < 0 || $grade > 100) {
             echo "<script type='text/javascript'>alert('Error: Grade must be between 0 and 100');</script>";
