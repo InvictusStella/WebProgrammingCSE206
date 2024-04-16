@@ -70,3 +70,8 @@ Login page does login and update, delete buttons for rows in courseDetails.php
 * index.html--> instructorIndex.php
 * logout button active
 * updatedBy and updateTime in courseDetails
+
+### NEW COMMIT
+
+* Average Grade to Percentage Grade
+* client-side verification moved to server-side
