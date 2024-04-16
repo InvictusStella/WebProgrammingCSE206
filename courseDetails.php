@@ -47,34 +47,42 @@
         $updateBy = $_SESSION['name'];
         $updateTime = date('Y-m-d', $_SESSION['accessTime']);
 
-        if($type == 'Final') {
-            $stt = "SELECT type, pk FROM exam WHERE courseFk = $cpk AND type = 'Final'";
-            $result = $conn->query($stt);
-    
-            if($result->num_rows > 0 && $pkUpdate != $result->fetch_assoc()['pk']) {
-                echo "Error: A final exam already exists for this course";
+        if(empty($date)) {
+            echo "<script type='text/javascript'>alert('Error: Date cannot be empty');</script>";
+        } else if(empty($grade)) {
+            echo "<script type='text/javascript'>alert('Error: Grade cannot be empty');</script>";
+        } else {
+            if($type == 'Final') {
+                $stt = "SELECT type, pk FROM exam WHERE courseFk = $cpk AND type = 'Final'";
+                $result = $conn->query($stt);
+        
+                if($result->num_rows > 0 && $pkUpdate != $result->fetch_assoc()['pk']) {
+                    echo "Error: A final exam already exists for this course";
+                    exit;
+                }
+            }
+
+
+            $resGrade = $conn->query("SELECT SUM(grade) as sum FROM exam WHERE courseFk = $cpk");
+            $sumGrade = $resGrade->fetch_assoc()['sum'] + $grade;
+
+            if($sumGrade < 0 || $sumGrade > 100) {
+                echo "<script type='text/javascript'>alert('Error: Total Grade must be between 0 and 100');</script>";
                 exit;
             }
+
+            $sql = "UPDATE exam SET type = ?, date = ?, grade = ?, updatedBy = ?, updateTime = ? WHERE pk = ?";
+            $stmt = $conn->prepare($sql);  
+            $stmt->bind_param("ssissi", $type, $date, $grade, $updateBy, $updateTime, $pkUpdate);
+
+            if ($stmt->execute()) {
+                echo "<script type='text/javascript'>alert('Exam updated successfully');</script>";
+            } else {
+                echo "<script type='text/javascript'>alert('Error updating exam');</script>";
+            }
+
+            $stmt->close();
         }
-
-
-
-        if($grade < 0 || $grade > 100) {
-            echo "<script type='text/javascript'>alert('Error: Grade must be between 0 and 100');</script>";
-            exit;
-        }
-
-        $sql = "UPDATE exam SET type = ?, date = ?, grade = ?, updatedBy = ?, updateTime = ? WHERE pk = ?";
-        $stmt = $conn->prepare($sql);  
-        $stmt->bind_param("ssissi", $type, $date, $grade, $updateBy, $updateTime, $pkUpdate);
-
-        if ($stmt->execute()) {
-            echo "<script type='text/javascript'>alert('Exam updated successfully');</script>";
-        } else {
-            echo "<script type='text/javascript'>alert('Error updating exam');</script>";
-        }
-
-        $stmt->close();
     }
 
     if (isset($_POST['logout'])) {
@@ -254,7 +262,7 @@
                             <th scope="col">Exam ID</th>
                             <th scope="col">Exam Type</th>
                             <th scope="col">Exam Date</th>
-                            <th scope="col">Average Score</th>
+                            <th scope="col">Percentage Score</th>
                             <th scope="col">Updated By</th>
                             <th scope="col">Update Time</th>
                         </tr>
@@ -273,7 +281,7 @@
                                     <td><?php echo $row['pk']; ?></td>
                                     <td><?php echo $row['type']; ?></td>
                                     <td><?php echo $row['date']; ?></td>
-                                    <td><?php echo $row['grade']; ?></td>
+                                    <td><?php echo $row['grade']; ?>%</td>
                                     <td><?php echo $row['updatedBy']; ?></td>
                                     <td><?php echo $row['updateTime']; ?></td>
                                     <td>

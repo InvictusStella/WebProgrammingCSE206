@@ -26,30 +26,46 @@
         $examType = $_POST['examType'];
         $examDate = $_POST['examDate'];
         $grade = filter_var($_POST['grade'], FILTER_SANITIZE_NUMBER_INT);
+        
+        if(empty($examDate)) {
+            echo "<script type='text/javascript'>alert('Error: Exam date is required');</script>";
+        } else if(empty($grade)) {
+            echo "<script type='text/javascript'>alert('Error: Grade is required');</script>";
+        } else {
 
-        if($grade < 0 || $grade > 100) {
-            echo "Error: Grade must be between 0 and 100";
-            exit;
-        }
+            $resGrade = $conn->query("SELECT SUM(grade) as sum FROM exam WHERE courseFk = $cpk");
+            $row = $resGrade->fetch_assoc();
 
-        if($examType == 'Final') {
-            $stmt_check = "SELECT * FROM exam WHERE courseFk = '$cpk' AND type = '$examType'";
-            $result_check = $conn->query($stmt_check);
-    
-            if($result_check->num_rows > 0) {
-                echo "Error: A final exam already exists for this course";
+            if($row['sum'] == null) {
+                $sumGrade = $grade;
+            } else {
+                $sumGrade = $row['sum'] + $grade;
+            }
+
+            if($sumGrade < 0 || $sumGrade > 100) {
+                echo "Error: Total grade must be between 0 and 100";
                 exit;
             }
-        }
 
-        $stmt = $conn->prepare("INSERT INTO exam (courseFk, date, type, grade) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $cpk, $examDate, $examType, $grade);
+            if($examType == 'Final') {
+                $stmt_check = "SELECT * FROM exam WHERE courseFk = '$cpk' AND type = '$examType'";
+                $result_check = $conn->query($stmt_check);
+        
+                if($result_check->num_rows > 0) {
+                    echo "Error: A final exam already exists for this course";
+                    exit;
+                }
+            }
 
-        if ($stmt->execute()) {
-            echo "<script type='text/javascript'>alert('Exam created successfully');</script>";
-            header('Location: courseDetails.php?cpk=' . $cpk);
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            $stmt = $conn->prepare("INSERT INTO exam (courseFk, date, type, grade) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("isss", $cpk, $examDate, $examType, $grade);
+
+            if ($stmt->execute()) {
+                echo "<script type='text/javascript'>alert('Exam created successfully');</script>";
+                header('Location: courseDetails.php?cpk=' . $cpk);
+            } else {
+                echo "Error: " . $sql . "<br>" . $conn->error;
+            }
         }
     }
 
@@ -206,7 +222,7 @@
                     <form class="mt-5" method="POST">
                         <div class="mb-3">
                             <label for="examType" class="form-label">Exam Type*</label>
-                            <select type="text" name = "examType" class="form-control" id="examType" required>
+                            <select type="text" name = "examType" class="form-control" id="examType">
                                 <option value="Midterm">Midterm</option>
                                 <option value="Final">Final</option>
                                 <option value="Quiz">Quiz</option>
@@ -215,11 +231,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="examDate" class="form-label">Exam Date*</label>
-                            <input type="date" name = "examDate" class="form-control" id="examDate" required>
+                            <input type="date" name = "examDate" class="form-control" id="examDate">
                         </div>
                         <div class="mb-3">
-                            <label for="grade" class="form-label">Average Grade*</label>
-                            <input type="number" name="grade" class="form-control" id="grade" placeholder="Enter the average grade" required>
+                            <label for="grade" class="form-label">Percentage Grade*</label>
+                            <input type="number" name="grade" class="form-control" id="grade" placeholder="Enter the average grade">
                         </div>
                         <button type="submit" name="submit" class="btn btn-primary">Create Exam</button>
                     </form>
