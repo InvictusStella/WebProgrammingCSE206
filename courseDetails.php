@@ -85,6 +85,30 @@
         }
     }
 
+    if(isset($_POST["addStudent"])) {
+        $studentId = $_POST['studentId'];
+        $studentName = $_POST['studentName'];
+
+        $sql = "SELECT pk FROM students WHERE students.pk = $studentId and students.name = '$studentName'";
+        $result = $conn->query($sql);
+
+        if($result->num_rows > 0) {
+            $sql = "INSERT INTO course_student (courseFk, studentFk) VALUES (?, ?)";
+            $stmt = $conn->prepare($sql);  
+            $stmt->bind_param("ii", $cpk, $studentId);
+
+            if ($stmt->execute()) {
+                echo "<script type='text/javascript'>alert('Student added successfully');</script>";
+            } else {
+                echo "<script type='text/javascript'>alert('Error adding student');</script>";
+            }
+
+            $stmt->close();
+        } else {
+            echo "<script type='text/javascript'>alert('Error: Student does not exist');</script>";
+        }
+    }
+
     if (isset($_POST['logout'])) {
         // Unset all of the session variables
         $_SESSION = array();
@@ -344,6 +368,68 @@
                     </a>
                 </div>               
 
+            </div>
+            <div class="container-fluid mt-5">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light mt-5 ms-auto">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Student ID</th>
+                            <th scope="col">Student Name</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php
+                            $sql = "SELECT s.pk, s.name FROM students AS s JOIN course_student AS cs ON s.pk = cs.studentFk WHERE cs.courseFk = $cpk";
+                            $result = $conn-> query($sql);
+                            $rowNum = 1;
+                            
+                            while ($row = $result->fetch_assoc()) {
+                                ?>
+                                
+                                <tr>
+                                    <td><?php echo $rowNum++ ?></td>
+                                    <td><?php echo $row['pk']; ?></td>
+                                    <td><?php echo $row['name']; ?></td>
+                                </tr>
+
+                                <?php
+                            }
+                        ?>
+                    </tbody>
+
+                </table>
+
+                <div class="studentAddButton" style="text-align: left">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                        Add Student
+                    </button>
+                </div>
+
+                <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addStudentModalLabel">Add Student</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="mb-3">
+                                        <label for="studentId" class="form-label">Student ID</label>
+                                        <input type="number" class="form-control" id="studentId" name="studentId">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="studentName" class="form-label">Student Name</label>
+                                        <input type="text" class="form-control" id="studentName" name="studentName">
+                                    </div>
+                                    <button type="submit" name="addStudent" class="btn btn-primary">Add</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

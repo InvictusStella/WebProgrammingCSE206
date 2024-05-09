@@ -31,6 +31,7 @@
 
             // Verify password
             if($password === $row['password']) {
+                $_SESSION['pk'] = $row['pk'];
                 $_SESSION['email'] = $row['email'];
                 $_SESSION['password'] = $row['password'];
                 $_SESSION['name'] = $row['name'];
@@ -44,7 +45,7 @@
                 if($result_instructor -> num_rows > 0) {
                     header('Location: instructorIndex.php');
                 } else {
-                    echo "Student page will be implemented soon.";
+                    header('Location: studentIndex.php');
                 }
             } else {
                 echo "Invalid password";
