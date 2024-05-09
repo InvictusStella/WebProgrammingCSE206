@@ -79,4 +79,4 @@ Login page does login and update, delete buttons for rows in courseDetails.php
 ### UPDATE 
 
 * Student index, exams, courses pages
-* For some reason i am getting a syntax error in php code and it also locks every part of the page except icon for some reason. I am confused.
+* For some reason i am getting a syntax error in php code and it also locks every part of the page except icon in student pages. I am confused.
