@@ -75,3 +75,8 @@ Login page does login and update, delete buttons for rows in courseDetails.php
 
 * Average Grade to Percentage Grade
 * client-side verification moved to server-side
+
+### UPDATE 
+
+* Student index, exams, courses pages
+* For some reason i am getting a syntax error in php code and it also locks every part of the page except icon for some reason. I am confused.
