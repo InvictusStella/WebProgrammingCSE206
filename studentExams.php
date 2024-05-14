@@ -6,13 +6,12 @@
     $db_name = "exam_system";
 
     $conn = new mysqli($servername, $username, $password, $db_name);
-    
-    if (isset($_GET['cpk'])) {
-        $cpk = $_GET['cpk'];
-    } else {
-        header('Location: courses.php');
-        exit;
+
+    if($conn -> connect_error) {
+        die("Connection failed: " . $conn -> connect_error);
     }
+
+    $pk = $_SESSION['pk'];
 
     if (isset($_POST['logout'])) {
         // Unset all of the session variables
@@ -79,17 +78,12 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="collapse" id="dashboardCollapse">
-                        <a id="Courses"
+                    <a id="Courses"
                            href=studentCourses.php
                            class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Courses</a>
-                        <a id="Events"
-                           href="#"
-                           class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Events</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3 ps-5"
-                           id="studentExamsButton"
-                           href=studentExams.php>
-                            Exams
-                        </a>
+                        <a id="Exams"
+                           href=studentExams.php
+                           class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Exams</a>
                     </div>
 
                     <button class="list-group-item list-group-item-action list-group-item-light p-3 d-flex justify-content-between align-items-center"
@@ -172,6 +166,7 @@
 
                         <tbody>
                             <?php
+                            
                                     $sql = "SELECT date, type, c.courseName as cname FROM exam AS e 
                                     JOIN courses AS c ON e.courseFk = c.pk
                                     JOIN course_student AS cs ON c.pk = cs.courseFk
@@ -188,6 +183,7 @@
                                             echo "</tr>";
                                         }
                                     }
+                                    
                             ?>
                         </tbody>
                     </table>

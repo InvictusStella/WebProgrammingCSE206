@@ -370,7 +370,7 @@
 
             </div>
             <div class="container-fluid mt-5">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="studentTable">
                     <thead class="table-light mt-5 ms-auto">
                         <tr>
                             <th scope="col">#</th>
@@ -423,6 +423,7 @@
                                     <div class="mb-3">
                                         <label for="studentName" class="form-label">Student Name</label>
                                         <input type="text" class="form-control" id="studentName" name="studentName">
+                                        <div id="searchResult"></div>
                                     </div>
                                     <button type="submit" name="addStudent" class="btn btn-primary">Add</button>
                                 </form>

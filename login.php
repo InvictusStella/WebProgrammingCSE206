@@ -21,9 +21,9 @@
           }
 
         // Prepare SQL statement to prevent SQL injection
-        $sql = "(SELECT name, email, password FROM students WHERE email = '$email' AND password = '$password') 
+        $sql = "(SELECT pk, name, email, password FROM students WHERE email = '$email' AND password = '$password') 
             UNION 
-            (SELECT name, email, password FROM instructors WHERE email = '$email' AND password = '$password')";
+            (SELECT pk, name, email, password FROM instructors WHERE email = '$email' AND password = '$password')";
         $result = $conn ->query($sql);
 
         if($result -> num_rows > 0) {

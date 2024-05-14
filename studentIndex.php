@@ -76,14 +76,9 @@
                         <a id="Courses"
                            href=studentCourses.php
                            class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Courses</a>
-                        <a id="Events"
-                           href="#"
-                           class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Events</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3 ps-5"
-                           id="studentExamsButton"
-                           href=studentExams.php>
-                            Exams
-                        </a>
+                        <a id="Exams"
+                           href=studentExams.php
+                           class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Exams</a>
                     </div>
 
                     <button class="list-group-item list-group-item-action list-group-item-light p-3 d-flex justify-content-between align-items-center"
@@ -154,7 +149,7 @@
                     </div>
                 </nav>
                 <!-- Page content-->
-                <div class="container-fluid">
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="p-16" style="padding: 5px">
                             <div class="h1">Upcoming Exams</div>
                             <div class="h4 secondary-text">
@@ -189,8 +184,11 @@
                                             echo "<td>" . $row['date'] . "</td>";
                                             echo "</tr>";
                                         }
+                                    }else {
+                                        echo "<tr><td colspan='3'>No upcoming exams</td></tr>";
                                     }
                                 ?>
+                               
                             </tbody>
                         </table>
                     </div>

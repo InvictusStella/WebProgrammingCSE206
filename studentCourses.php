@@ -75,14 +75,9 @@
                         <a id="Courses"
                            href=studentCourses.php
                            class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Courses</a>
-                        <a id="Events"
-                           href="#"
-                           class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Events</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3 ps-5"
-                           id="studentExamsButton"
-                           href=studentExams.php>
-                            Exams
-                        </a>
+                        <a id="Exams"
+                           href=studentExams.php
+                           class="list-group-item list-group-item-action list-group-item-light p-3 ps-5">Exams</a>
                     </div>
 
                     <button class="list-group-item list-group-item-action list-group-item-light p-3 d-flex justify-content-between align-items-center"
@@ -165,6 +160,7 @@
 
                         <tbody>
                             <?php
+                                
                                 $pk = $_SESSION['pk'];
 
                                 $stmt = "SELECT courseFk FROM course_student WHERE studentFk = $pk";
@@ -181,9 +177,9 @@
 
                                     while ($row2 = $result->fetch_assoc()) {
                                         echo "<tr>";
-                                        echo "<td>" . $row3['courseCode'] . "</td>";
-                                        echo "<td>" . $row3['courseName'] . "</td>";
-                                        echo "<td>" . $row3['iname'] . "</td>";
+                                        echo "<td>" . $row2['courseCode'] . "</td>";
+                                        echo "<td>" . $row2['courseName'] . "</td>";
+                                        echo "<td>" . $row2['iname'] . "</td>";
                                         echo "</tr>";
                                     }
                                 }
